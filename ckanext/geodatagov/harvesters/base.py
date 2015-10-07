@@ -89,9 +89,11 @@ class GeoDataGovHarvester(SpatialHarvester):
 
         package_dict['extras'].append({'key': 'metadata_type', 'value': 'geospatial'})
 
+#JJ: Why is this here?  Distribution is not mandatory in POD -- can we just remove this block?
         if not package_dict.get('resources'):
             self._save_object_error('No resources invalid metadata', harvest_object, 'Import')
             return None
+######################
 
         return package_dict
 
@@ -104,6 +106,10 @@ class GeoDataGovHarvester(SpatialHarvester):
         if not transform_service:
             self._save_object_error('No FGDC to ISO transformation service', harvest_object, 'Import')
             return None
+
+#JJ: We are already validating the document against FGDC schema, if it passes this, we should put it into
+#the catalog no matter what happens when we try and transform to ISO.  See suggested approach 
+#in code for fgdc2iso.war
 
         # Validate against FGDC schema
         if self.source_config.get('validator_profiles'):
@@ -153,6 +159,8 @@ class GeoDataGovHarvester(SpatialHarvester):
         if response.status_code == 200:
             # XML coming from the conversion tool is already declared and encoded as utf-8
             return response.content
+# JJ: See suggested approach in fgdc2iso.war -- might need to handle 409 errors specifically vs.
+# any error that is returned?
         else:
             msg = 'The transformation service returned an error for object {0}'
             if response.status_code and response.content:
