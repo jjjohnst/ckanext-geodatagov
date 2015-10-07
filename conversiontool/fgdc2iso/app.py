@@ -40,6 +40,9 @@ def transform(xmldoc, xslt=config.defualt_xslt):
     if _transform is None:
         tFactory = TransformerFactory.newInstance()
         tFactory.setAttribute('http://saxon.sf.net/feature/licenseFileLocation', '/etc/saxon-license.lic')
+        # JJ: not sure I have the right syntax here, but can Saxon be set to continue on error?
+        tFactory.setAttribute(FeatureKeys.RECOVERY_POLICY, new Integer(Controller.RECOVER_SILENTLY));
+        #
         try:
             _transform = tFactory.newTransformer(StreamSource(JavaFile(xslt)))
         except TransformerConfigurationException, tce:
@@ -69,6 +72,9 @@ def handler(environ, start_response):
     try:
         result = transform(request)
     except TransformerException, e:
+        #If the change above were made, might need to more gracefully handle errors here, i.e.: an exception might be thrown,
+        #but if processing continued anyway through completion, we would want to perhaps log the error... but still
+        #return [result]
         logging.error("%s" % e)
         start_response("409 Integrity Error", [ ('content-type', 'text/xml') ])
         return ["%s" % e]
