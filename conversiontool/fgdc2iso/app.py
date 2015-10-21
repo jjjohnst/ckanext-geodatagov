@@ -41,6 +41,7 @@ def transform(xmldoc, xslt=config.defualt_xslt):
         tFactory = TransformerFactory.newInstance()
         tFactory.setAttribute('http://saxon.sf.net/feature/licenseFileLocation', '/etc/saxon-license.lic')
         # JJ: not sure I have the right syntax here, but can Saxon be set to continue on error?
+        #10/21.  agreed to try and run a pass against a "minimal transform" in the event that an error is thrown here.  Will work on XSLT
         tFactory.setAttribute(FeatureKeys.RECOVERY_POLICY, new Integer(Controller.RECOVER_SILENTLY));
         #
         try:
